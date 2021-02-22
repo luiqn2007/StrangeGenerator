@@ -32,7 +32,11 @@ public class WorldData implements IWorldData {
 
     @Override
     public void newPistonGenerator(BlockPos pos, @Nullable PlayerEntity owner) {
-        pistonGenerators.put(pos, new PistonGenerator(owner == null ? null : owner.getUniqueID()));
+        if (owner == null && (!pistonGenerators.containsKey(pos) || pistonGenerators.get(pos).owner == null)) {
+            pistonGenerators.put(pos, new PistonGenerator((UUID) null));
+        } else if (owner != null) {
+            pistonGenerators.put(pos, new PistonGenerator(owner.getUniqueID()));
+        }
     }
 
     @Override
@@ -43,7 +47,7 @@ public class WorldData implements IWorldData {
     @Override
     public int getPistonGeneratorCount(PlayerEntity owner) {
         return (int) pistonGenerators.values().stream()
-                .filter(generator -> generator.owner.equals(owner.getUniqueID()))
+                .filter(generator -> owner.getUniqueID().equals(generator.owner))
                 .count();
     }
 
@@ -54,11 +58,7 @@ public class WorldData implements IWorldData {
 
     @Override
     public Optional<PistonGenerator> getPistonGenerator(BlockPos pos) {
-        if (pistonGenerators.containsKey(pos)) {
-            return Optional.of(pistonGenerators.get(pos));
-        } else {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(pistonGenerators.get(pos));
     }
 
     @Override

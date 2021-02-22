@@ -162,9 +162,8 @@ public abstract class BasePacketInvitations<T extends BaseTileGenerator & IInvit
     private void addGenerator(T generator, InvitationMap.Builder builder) {
         ResourceLocation world = Objects.requireNonNull(generator.getWorld()).getDimensionKey().getLocation();
         BlockPos pos = generator.getPos();
-        for (UUID id : generator.getInvitedIds()) {
-            Player player = new Player(id);
-            builder.add(world, pos, player);
+        for (Player player : generator.getInvitedPlayers()) {
+            builder.add(world, pos, player.getStatus());
         }
     }
 

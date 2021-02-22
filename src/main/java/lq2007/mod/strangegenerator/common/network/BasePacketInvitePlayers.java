@@ -2,7 +2,6 @@ package lq2007.mod.strangegenerator.common.network;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import lq2007.mod.strangegenerator.common.data.InvitationMap;
 import lq2007.mod.strangegenerator.common.data.Player;
 import lq2007.mod.strangegenerator.common.tile.BaseTileGenerator;
 import lq2007.mod.strangegenerator.common.tile.IInviteGenerator;
@@ -31,7 +30,7 @@ public abstract class BasePacketInvitePlayers<T extends BaseTileGenerator & IInv
     protected final BlockPos pos;
     protected final ResourceLocation world, teWorld;
     protected final boolean allWorld, skipAccepted, onlyAccepted;
-    protected final ImmutableList<Player> players;
+    protected final ImmutableList<Player.CurrentStatus> players;
 
     /**
      * Request all players
@@ -62,7 +61,7 @@ public abstract class BasePacketInvitePlayers<T extends BaseTileGenerator & IInv
      * @param teWorld generator's world
      * @param pos generator's pos
      */
-    public BasePacketInvitePlayers(boolean allWorld, boolean skipAccepted, boolean onlyAccepted, @Nullable ResourceLocation world, ResourceLocation teWorld, BlockPos pos, ImmutableList<Player> players) {
+    public BasePacketInvitePlayers(boolean allWorld, boolean skipAccepted, boolean onlyAccepted, @Nullable ResourceLocation world, ResourceLocation teWorld, BlockPos pos, ImmutableList<Player.CurrentStatus> players) {
         this.filterMask = ByteUtils.pack(allWorld, skipAccepted, onlyAccepted, world != null);
         this.allWorld = allWorld;
         this.skipAccepted = skipAccepted;
@@ -82,10 +81,10 @@ public abstract class BasePacketInvitePlayers<T extends BaseTileGenerator & IInv
         this.world = values[3] ? buffer.readResourceLocation() : null;
         this.teWorld = buffer.readResourceLocation();
         this.pos = buffer.readBlockPos();
-        ImmutableList.Builder<Player> listBuilder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<Player.CurrentStatus> listBuilder = new ImmutableList.Builder<>();
         int playerCount = buffer.readVarInt();
         for (int i = 0; i < playerCount; i++) {
-            listBuilder.add(new Player(buffer));
+            listBuilder.add(new Player.CurrentStatus(buffer));
         }
         this.players = listBuilder.build();
     }
@@ -104,14 +103,14 @@ public abstract class BasePacketInvitePlayers<T extends BaseTileGenerator & IInv
 
     @Override
     public void consume(NetworkEvent.Context context, MinecraftServer server, ServerPlayerEntity sender) {
-        ImmutableList.Builder<Player> builder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<Player.CurrentStatus> builder = new ImmutableList.Builder<>();
         ServerWorld teSWorld = server.getWorld(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, teWorld));
         if (teSWorld != null) {
             T generator = getGeneratorType().getIfExists(teSWorld, pos);
             if (generator != null) {
                 if (onlyAccepted) {
-                    for (UUID uuid : generator.getInvitedIds()) {
-                        builder.add(new Player(uuid));
+                    for (Player player : generator.getInvitedPlayers()) {
+                        builder.add(player.getStatus());
                     }
                 } else {
                     Set<UUID> skips = skipAccepted ? generator.getInvitedIds() : ImmutableSet.of();
@@ -133,16 +132,16 @@ public abstract class BasePacketInvitePlayers<T extends BaseTileGenerator & IInv
         // todo update gui
     }
 
-    private void addPlayers(@Nullable ServerWorld sw, Set<UUID> skips, ImmutableList.Builder<Player> builder) {
+    private void addPlayers(@Nullable ServerWorld sw, Set<UUID> skips, ImmutableList.Builder<Player.CurrentStatus> builder) {
         if (sw == null) return;
         for (ServerPlayerEntity player : sw.getPlayers()) {
             if (!skips.contains(player.getUniqueID())) {
-                builder.add(new Player(player));
+                builder.add(new Player(player).getStatus());
             }
         }
     }
 
     protected abstract TileEntityType<T> getGeneratorType();
 
-    protected abstract BasePacketInvitePlayers<T> withInvitations(ImmutableList<Player> invitations);
+    protected abstract BasePacketInvitePlayers<T> withInvitations(ImmutableList<Player.CurrentStatus> invitations);
 }

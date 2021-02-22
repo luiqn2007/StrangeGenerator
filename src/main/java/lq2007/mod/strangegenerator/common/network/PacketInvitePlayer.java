@@ -17,7 +17,7 @@ public class PacketInvitePlayer extends BasePacketInvitePlayers<TileInviteGenera
         super(allWorld, skipAccepted, onlyAccepted, world, teWorld, pos);
     }
 
-    public PacketInvitePlayer(boolean allWorld, boolean skipAccepted, boolean onlyAccepted, @Nullable ResourceLocation world, ResourceLocation teWorld, BlockPos pos, ImmutableList<Player> players) {
+    public PacketInvitePlayer(boolean allWorld, boolean skipAccepted, boolean onlyAccepted, @Nullable ResourceLocation world, ResourceLocation teWorld, BlockPos pos, ImmutableList<Player.CurrentStatus> players) {
         super(allWorld, skipAccepted, onlyAccepted, world, teWorld, pos, players);
     }
 
@@ -31,7 +31,7 @@ public class PacketInvitePlayer extends BasePacketInvitePlayers<TileInviteGenera
     }
 
     @Override
-    protected BasePacketInvitePlayers<TileInviteGenerator> withInvitations(ImmutableList<Player> invitations) {
+    protected BasePacketInvitePlayers<TileInviteGenerator> withInvitations(ImmutableList<Player.CurrentStatus> invitations) {
         return new PacketInvitePlayer(allWorld, skipAccepted, onlyAccepted, world, teWorld, pos, invitations);
     }
 }

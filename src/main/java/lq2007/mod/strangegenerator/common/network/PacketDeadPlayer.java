@@ -18,7 +18,7 @@ public class PacketDeadPlayer extends BasePacketInvitePlayers<TileDeadGenerator>
         super(allWorld, skipAccepted, onlyAccepted, world, teWorld, pos);
     }
 
-    public PacketDeadPlayer(boolean allWorld, boolean skipAccepted, boolean onlyAccepted, @Nullable ResourceLocation world, ResourceLocation teWorld, BlockPos pos, ImmutableList<Player> players) {
+    public PacketDeadPlayer(boolean allWorld, boolean skipAccepted, boolean onlyAccepted, @Nullable ResourceLocation world, ResourceLocation teWorld, BlockPos pos, ImmutableList<Player.CurrentStatus> players) {
         super(allWorld, skipAccepted, onlyAccepted, world, teWorld, pos, players);
     }
 
@@ -32,7 +32,7 @@ public class PacketDeadPlayer extends BasePacketInvitePlayers<TileDeadGenerator>
     }
 
     @Override
-    protected BasePacketInvitePlayers<TileDeadGenerator> withInvitations(ImmutableList<Player> invitations) {
+    protected BasePacketInvitePlayers<TileDeadGenerator> withInvitations(ImmutableList<Player.CurrentStatus> invitations) {
         return new PacketDeadPlayer(allWorld, skipAccepted, onlyAccepted, world, teWorld, pos, invitations);
     }
 }

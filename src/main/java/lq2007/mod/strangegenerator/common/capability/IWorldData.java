@@ -100,23 +100,24 @@ public interface IWorldData extends ICapabilitySerializable<CompoundNBT> {
         }
 
         PistonGenerator(UUID owner, EnergyStorage storage) {
-            this.storage = new EnergyStorage(100000 /* todo configuration */);
+            this.storage = storage;
             this.owner = owner;
         }
 
         PistonGenerator(CompoundNBT compound) {
-            this.storage = new EnergyStorage(0);
+            this.storage = new EnergyStorage(compound.getInt("capacity"));
+            this.storage.receiveEnergy(compound.getInt("energy"), false);
             if (compound.hasUniqueId("owner")) {
                 this.owner = compound.getUniqueId("owner");
             } else {
                 this.owner = null;
             }
-            CapabilityEnergy.ENERGY.getStorage().readNBT(CapabilityEnergy.ENERGY, storage, null, compound.get("energy"));
         }
 
         CompoundNBT write(BlockPos pos) {
             CompoundNBT nbt = new CompoundNBT();
-            nbt.put("energy", CapabilityEnergy.ENERGY.getStorage().writeNBT(CapabilityEnergy.ENERGY, storage, null));
+            nbt.putInt("capacity", storage.getMaxEnergyStored());
+            nbt.putInt("energy", storage.getEnergyStored());
             nbt.put("pos", NBTUtil.writeBlockPos(pos));
             if (owner != null) {
                 nbt.putUniqueId("owner", owner);

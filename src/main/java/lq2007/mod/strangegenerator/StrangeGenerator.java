@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
  * <ul>
  *     <li>Can't keep up 发电机</li>
  *     <li>垃圾桶发电</li>
- *     <li>活塞发电机</li>
  *     <li>建筑发电机</li>
  *     <li>红石发电（？？？）</li>
  *     <li>UUID 发电</li>

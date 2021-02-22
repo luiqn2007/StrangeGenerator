@@ -42,6 +42,9 @@ public abstract class BaseTileGenerator extends TileEntity {
 
     public void placedBy(World worldIn, BlockPos pos, BlockState state, PlayerEntity placer, ItemStack stack) {
         owner = placer.getUniqueID();
+        if (this instanceof IInviteGenerator) {
+            ((IInviteGenerator) this).invite(placer);
+        }
         markDirty();
     }
 
@@ -57,10 +60,6 @@ public abstract class BaseTileGenerator extends TileEntity {
             }
         }
         return false;
-    }
-
-    public boolean isOwner(PlayerEntity player) {
-        return owner != null && owner.equals(player.getUniqueID());
     }
 
     public boolean isOwner(UUID player) {
@@ -106,7 +105,7 @@ public abstract class BaseTileGenerator extends TileEntity {
         updateCache(Set::add);
     }
 
-    private void updateCache(BiConsumer<Set<BaseTileGenerator>, BaseTileGenerator> update) {
+    protected void updateCache(BiConsumer<Set<BaseTileGenerator>, BaseTileGenerator> update) {
         Objects.requireNonNull(world, "World is NULL!!!");
         if (owner == null) {
             PlayerEntity placer = OwnerBlockItem.findPlacer(world, pos);

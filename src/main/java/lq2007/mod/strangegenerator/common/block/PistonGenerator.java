@@ -5,10 +5,12 @@ import com.google.common.collect.Table;
 import lq2007.mod.strangegenerator.common.capability.Capabilities;
 import lq2007.mod.strangegenerator.common.tile.NoTileGenerator;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IWorld;
@@ -27,8 +29,8 @@ public class PistonGenerator extends BaseGenerator<NoTileGenerator> {
 
     /**
      * Table0: World - PistonPosition - Generator
-     *  EXTEND: Replaced by MovingPistonBlock, Add replace MovingPistonBlock
-     *  RETRACT: Replaced by AirBlock, Add replace MovingPistonBlock
+     * EXTEND: Replaced by MovingPistonBlock, Add replace MovingPistonBlock
+     * RETRACT: Replaced by AirBlock, Add replace MovingPistonBlock
      */
     public static final Table<World, BlockPos, MovingGenerator> MOVING_GENERATORS0 = HashBasedTable.create();
     /**
@@ -44,17 +46,19 @@ public class PistonGenerator extends BaseGenerator<NoTileGenerator> {
     @Override
     protected boolean canPlace(BlockItemUseContext context) {
         World world = context.getWorld();
-        PlayerEntity player = context.getPlayer();
-        if (player == null) return false;
+        if (!world.isRemote) {
+            PlayerEntity player = context.getPlayer();
+            if (player == null) return false;
 //        return Capabilities.getWorldData(world).getPistonGeneratorCount(player) < 1 /* todo configuration */;
-        System.out.println("Place by player " + player);
+            return true;
+        }
         return true;
     }
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-        if (placer instanceof PlayerEntity) {
+        if (!worldIn.isRemote && placer instanceof PlayerEntity) {
             Capabilities.getWorldData(worldIn).newPistonGenerator(pos, (PlayerEntity) placer);
         }
     }
@@ -62,12 +66,11 @@ public class PistonGenerator extends BaseGenerator<NoTileGenerator> {
     @Override
     public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onBlockAdded(state, worldIn, pos, oldState, isMoving);
-        if (isMoving) {
+        if (!worldIn.isRemote) {
             MovingGenerator mg = MOVING_GENERATORS1.remove(worldIn, pos);
-            if (mg != null) {
+            if (isMoving && mg != null) {
                 MOVING_GENERATORS0.remove(worldIn, mg.piston);
                 Capabilities.getWorldData(worldIn).addPistonGenerator(pos, mg.owner, mg.storage);
-                System.out.println("Resume from piston at " + pos);
             } else {
                 Capabilities.getWorldData(worldIn).newPistonGenerator(pos, null);
             }
@@ -77,8 +80,9 @@ public class PistonGenerator extends BaseGenerator<NoTileGenerator> {
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         super.onReplaced(state, worldIn, pos, newState, isMoving);
-        System.out.println("Remove at " + pos);
-//        Capabilities.getWorldData(worldIn).removePistonGenerator(pos);
+        if (!worldIn.isRemote) {
+            Capabilities.getWorldData(worldIn).removePistonGenerator(pos);
+        }
     }
 
     private static class MovingGenerator {
@@ -94,9 +98,7 @@ public class PistonGenerator extends BaseGenerator<NoTileGenerator> {
         }
 
         public void addEnergy() {
-            int e = storage.getEnergyStored();
             storage.receiveEnergy(100 /* todo configuration */, false);
-            System.out.println(e + " -> " + storage.getEnergyStored());
         }
     }
 
@@ -105,18 +107,35 @@ public class PistonGenerator extends BaseGenerator<NoTileGenerator> {
 
         @SubscribeEvent
         public static void prePistonMove(PistonEvent.Pre event) {
-            BlockPos pos = event.getPos();
-            BlockPos target = event.getFaceOffsetPos();
             IWorld world = event.getWorld();
             if (!world.isRemote() && world instanceof World) {
+                BlockPos piston = event.getPos();
+                Direction direction = event.getDirection();
+                BlockPos block, target;
+                switch (event.getPistonMoveType()) {
+                    case EXTEND: {
+                        if (world.getBlockState(piston).getBlock() == Blocks.STICKY_PISTON || world.getBlockState(piston).getBlock() == Blocks.PISTON) {
+                            block = event.getFaceOffsetPos();
+                            target = block.offset(direction);
+                            break;
+                        } else return;
+                    }
+                    case RETRACT: {
+                        if (world.getBlockState(piston).getBlock() == Blocks.STICKY_PISTON) {
+                            target = event.getFaceOffsetPos();
+                            block = target.offset(direction);
+                            break;
+                        } else return;
+                    }
+                    default:
+                        return;
+                }
                 World w = (World) world;
-                Capabilities.getWorldData(w).getPistonGenerator(target).ifPresent(generator -> {
+                Capabilities.getWorldData(w).getPistonGenerator(block).ifPresent(generator -> {
                     // todo final pos error: back
-                    BlockPos finalPos = target.offset(event.getDirection());
-                    MovingGenerator mg = new MovingGenerator(generator.owner, generator.storage, pos, finalPos);
-                    MOVING_GENERATORS0.put(w, pos, mg);
-                    MOVING_GENERATORS1.put(w, finalPos, mg);
-                    System.out.println("Add moving generator from " + pos + " to " + finalPos);
+                    MovingGenerator mg = new MovingGenerator(generator.owner, generator.storage, piston, target);
+                    MOVING_GENERATORS0.put(w, piston, mg);
+                    MOVING_GENERATORS1.put(w, target, mg);
                 });
             }
         }

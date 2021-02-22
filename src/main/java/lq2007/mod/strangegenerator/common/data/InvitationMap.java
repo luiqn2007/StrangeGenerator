@@ -15,24 +15,24 @@ public class InvitationMap {
 
     public static InvitationMap EMPTY = new InvitationMap(ImmutableTable.of());
 
-    private final ImmutableTable<ResourceLocation, BlockPos, ImmutableList<Player>> invitationMap;
+    private final ImmutableTable<ResourceLocation, BlockPos, ImmutableList<Player.CurrentStatus>> invitationMap;
 
-    private InvitationMap(ImmutableTable<ResourceLocation, BlockPos, ImmutableList<Player>> invitationMap) {
+    private InvitationMap(ImmutableTable<ResourceLocation, BlockPos, ImmutableList<Player.CurrentStatus>> invitationMap) {
         this.invitationMap = invitationMap;
     }
 
     public InvitationMap(PacketBuffer buffer) {
         int worldCount = buffer.readVarInt();
-        ImmutableTable.Builder<ResourceLocation, BlockPos, ImmutableList<Player>> tableBuilder = new ImmutableTable.Builder<>();
+        ImmutableTable.Builder<ResourceLocation, BlockPos, ImmutableList<Player.CurrentStatus>> tableBuilder = new ImmutableTable.Builder<>();
         for (int i = 0; i < worldCount; i++) {
             ResourceLocation world = buffer.readResourceLocation();
             int posCount = buffer.readVarInt();
             for (int i1 = 0; i1 < posCount; i1++) {
                 BlockPos pos = buffer.readBlockPos();
                 int playerCount = buffer.readVarInt();
-                ImmutableList.Builder<Player> listBuilder = new ImmutableList.Builder<>();
+                ImmutableList.Builder<Player.CurrentStatus> listBuilder = new ImmutableList.Builder<>();
                 for (int i2 = 0; i2 < playerCount; i2++) {
-                    listBuilder.add(new Player(buffer));
+                    listBuilder.add(new Player.CurrentStatus(buffer));
                 }
                 tableBuilder.put(world, pos, listBuilder.build());
             }
@@ -40,15 +40,15 @@ public class InvitationMap {
         this.invitationMap = tableBuilder.build();
     }
 
-    public void forEachId(TriConsumer<ResourceLocation, BlockPos, Player> consumer) {
+    public void forEachId(TriConsumer<ResourceLocation, BlockPos, Player.CurrentStatus> consumer) {
         invitationMap.rowMap().forEach((world, map) -> map.forEach((pos, uuids) -> uuids.forEach(uuid -> consumer.accept(world, pos, uuid))));
     }
 
-    public void forEach(TriConsumer<ResourceLocation, BlockPos, ImmutableList<Player>> consumer) {
+    public void forEach(TriConsumer<ResourceLocation, BlockPos, ImmutableList<Player.CurrentStatus>> consumer) {
         invitationMap.rowMap().forEach((world, map) -> map.forEach((pos, uuids) -> consumer.accept(world, pos, uuids)));
     }
 
-    public ImmutableList<Player> get(ResourceLocation world, BlockPos pos) {
+    public ImmutableList<Player.CurrentStatus> get(ResourceLocation world, BlockPos pos) {
         return invitationMap.get(world, pos);
     }
 
@@ -57,7 +57,7 @@ public class InvitationMap {
     }
 
     public void write(PacketBuffer buffer) {
-        ImmutableMap<ResourceLocation, Map<BlockPos, ImmutableList<Player>>> worldMap = invitationMap.rowMap();
+        ImmutableMap<ResourceLocation, Map<BlockPos, ImmutableList<Player.CurrentStatus>>> worldMap = invitationMap.rowMap();
         buffer.writeVarInt(worldMap.size());
         worldMap.forEach((world, posMap) -> {
             buffer.writeResourceLocation(world);
@@ -71,24 +71,24 @@ public class InvitationMap {
     }
 
     public static class Builder {
-        private final Table<ResourceLocation, BlockPos, ImmutableList.Builder<Player>> map;
+        private final Table<ResourceLocation, BlockPos, ImmutableList.Builder<Player.CurrentStatus>> map;
 
         public Builder() {
             this.map = HashBasedTable.create();
         }
 
-        public Builder add(ResourceLocation world, BlockPos pos, Player player) {
+        public Builder add(ResourceLocation world, BlockPos pos, Player.CurrentStatus player) {
             CollectionUtils.computeIfAbsent(map, world, pos, ImmutableList.Builder::new).add(player);
             return this;
         }
 
-        public Builder addAll(ResourceLocation world, BlockPos pos, Iterable<Player> players) {
+        public Builder addAll(ResourceLocation world, BlockPos pos, Iterable<Player.CurrentStatus> players) {
             CollectionUtils.computeIfAbsent(map, world, pos, ImmutableList.Builder::new).addAll(players);
             return this;
         }
 
         public InvitationMap build() {
-            ImmutableTable.Builder<ResourceLocation, BlockPos, ImmutableList<Player>> map2 = new ImmutableTable.Builder<>();
+            ImmutableTable.Builder<ResourceLocation, BlockPos, ImmutableList<Player.CurrentStatus>> map2 = new ImmutableTable.Builder<>();
             map.rowMap().forEach((world, c) -> c.forEach((pos, builder) -> map2.put(world, pos, builder.build())));
             return new InvitationMap(map2.build());
         }

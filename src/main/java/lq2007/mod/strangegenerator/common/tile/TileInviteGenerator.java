@@ -1,18 +1,15 @@
 package lq2007.mod.strangegenerator.common.tile;
 
 import com.google.common.collect.ImmutableSet;
+import lq2007.mod.strangegenerator.StrangeGenerator;
 import lq2007.mod.strangegenerator.common.data.Player;
-import lq2007.mod.strangegenerator.util.NBTUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class TileInviteGenerator extends BaseTickableTileGenerator implements IInviteGenerator {
 
@@ -21,7 +18,7 @@ public class TileInviteGenerator extends BaseTickableTileGenerator implements II
     private int lastCount = 0, lastEnergy = 0;
 
     public TileInviteGenerator() {
-        super(TileEntities.TILE_INVITE_GENERATOR.get(), false);
+        super(StrangeGenerator.TILE_ENTITIES.get(TileInviteGenerator.class), false);
     }
 
     @Override

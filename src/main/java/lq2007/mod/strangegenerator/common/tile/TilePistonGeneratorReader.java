@@ -1,5 +1,6 @@
 package lq2007.mod.strangegenerator.common.tile;
 
+import lq2007.mod.strangegenerator.StrangeGenerator;
 import lq2007.mod.strangegenerator.common.capability.Capabilities;
 import lq2007.mod.strangegenerator.common.capability.IWorldData;
 import net.minecraft.tileentity.TileEntity;
@@ -14,10 +15,10 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TilePistonGenerator extends TileEntity {
+public class TilePistonGeneratorReader extends TileEntity {
 
-    public TilePistonGenerator() {
-        super(TileEntities.TILE_PISTON_GENERATOR.get());
+    public TilePistonGeneratorReader() {
+        super(StrangeGenerator.TILE_ENTITIES.get(TilePistonGeneratorReader.class));
     }
 
     @Nonnull

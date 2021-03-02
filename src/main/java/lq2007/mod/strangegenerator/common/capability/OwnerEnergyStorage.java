@@ -35,4 +35,12 @@ public class OwnerEnergyStorage extends EnergyStorage implements INBTSerializabl
     public boolean isFull() {
         return energy >= capacity;
     }
+
+    public void removeEnergy(int energy) {
+        if (this.energy > energy) {
+            this.energy -= energy;
+        } else {
+            this.energy = 0;
+        }
+    }
 }

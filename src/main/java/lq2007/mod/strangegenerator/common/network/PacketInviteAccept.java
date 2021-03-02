@@ -1,13 +1,10 @@
 package lq2007.mod.strangegenerator.common.network;
 
 import lq2007.mod.strangegenerator.common.tile.IInviteGenerator;
-import lq2007.mod.strangegenerator.common.tile.TileEntities;
-import lq2007.mod.strangegenerator.common.tile.TileInviteGenerator;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;

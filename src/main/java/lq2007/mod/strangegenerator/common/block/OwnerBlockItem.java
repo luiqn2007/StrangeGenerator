@@ -1,7 +1,8 @@
-package lq2007.mod.strangegenerator.common.item;
+package lq2007.mod.strangegenerator.common.block;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import lq2007.mod.strangegenerator.common.item.GroupGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,7 +10,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.RegistryObject;
 
 public class OwnerBlockItem<T extends Block> extends BlockItem {
 
@@ -20,8 +20,8 @@ public class OwnerBlockItem<T extends Block> extends BlockItem {
         return (world.isRemote ? OWNER_CLIENT : OWNER_SERVER).get(world, pos);
     }
 
-    public OwnerBlockItem(RegistryObject<T> obj) {
-        super(obj.get(), new Properties().group(Items.GROUP_GENERATOR).maxStackSize(1));
+    public OwnerBlockItem(T obj) {
+        super(obj, new Properties().group(GroupGenerator.INSTANCE).maxStackSize(1));
     }
 
     @Override

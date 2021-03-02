@@ -1,6 +1,6 @@
 package lq2007.mod.strangegenerator.common.block;
 
-import lq2007.mod.strangegenerator.common.tile.TilePistonGenerator;
+import lq2007.mod.strangegenerator.common.tile.TilePistonGeneratorReader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
@@ -23,6 +23,6 @@ public class PistonGeneratorReader extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new TilePistonGenerator();
+        return new TilePistonGeneratorReader();
     }
 }

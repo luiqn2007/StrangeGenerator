@@ -1,5 +1,6 @@
 package lq2007.mod.strangegenerator.common.tile;
 
+import lq2007.mod.strangegenerator.StrangeGenerator;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -23,7 +24,7 @@ public class TileLoveGenerator extends BaseTileGenerator {
     private AxisAlignedBB watchedRange = new AxisAlignedBB(BlockPos.ZERO);
 
     public TileLoveGenerator() {
-        super(TileEntities.TILE_LOVE_GENERATOR.get(), false);
+        super(StrangeGenerator.TILE_ENTITIES.get(TileLoveGenerator.class), false);
     }
 
     private float getRange() {
@@ -54,7 +55,7 @@ public class TileLoveGenerator extends BaseTileGenerator {
 
         @SubscribeEvent
         public static void onEntityUpdate(LivingEvent.LivingUpdateEvent event) {
-            TileEntityType<TileLoveGenerator> type = TileEntities.TILE_LOVE_GENERATOR.get();
+            TileEntityType<TileLoveGenerator> type = StrangeGenerator.TILE_ENTITIES.get(TileLoveGenerator.class);
             LivingEntity entity = event.getEntityLiving();
             if (entity.world != null && !entity.world.isRemote && entity instanceof AnimalEntity && entity.isAlive()) {
                 AnimalEntity animal = (AnimalEntity) entity;

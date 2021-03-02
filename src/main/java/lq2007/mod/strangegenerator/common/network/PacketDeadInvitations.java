@@ -1,9 +1,8 @@
 package lq2007.mod.strangegenerator.common.network;
 
+import lq2007.mod.strangegenerator.StrangeGenerator;
 import lq2007.mod.strangegenerator.common.data.InvitationMap;
 import lq2007.mod.strangegenerator.common.tile.TileDeadGenerator;
-import lq2007.mod.strangegenerator.common.tile.TileEntities;
-import lq2007.mod.strangegenerator.common.tile.TileInviteGenerator;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
@@ -27,7 +26,7 @@ public class PacketDeadInvitations extends BasePacketInvitations<TileDeadGenerat
 
     @Override
     protected TileEntityType<TileDeadGenerator> getGeneratorType() {
-        return TileEntities.TILE_DEAD_GENERATOR.get();
+        return StrangeGenerator.TILE_ENTITIES.get(TileDeadGenerator.class);
     }
 
     @Override

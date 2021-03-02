@@ -118,6 +118,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+    // https://mvnrepository.com/artifact/org.eclipse.mylyn.github/org.eclipse.egit.github.core
+    compile(group: 'org.eclipse.mylyn.github', name: 'org.eclipse.egit.github.core', version: '2.1.5') {
+        exclude module: 'gson'
+    }
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

@@ -1,8 +1,8 @@
 package lq2007.mod.strangegenerator.common.network;
 
 import com.google.common.collect.ImmutableList;
+import lq2007.mod.strangegenerator.StrangeGenerator;
 import lq2007.mod.strangegenerator.common.data.Player;
-import lq2007.mod.strangegenerator.common.tile.TileEntities;
 import lq2007.mod.strangegenerator.common.tile.TileInviteGenerator;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntityType;
@@ -27,7 +27,7 @@ public class PacketInvitePlayer extends BasePacketInvitePlayers<TileInviteGenera
 
     @Override
     protected TileEntityType<TileInviteGenerator> getGeneratorType() {
-        return TileEntities.TILE_INVITE_GENERATOR.get();
+        return StrangeGenerator.TILE_ENTITIES.get(TileInviteGenerator.class);
     }
 
     @Override

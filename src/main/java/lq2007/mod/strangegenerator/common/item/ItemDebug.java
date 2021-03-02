@@ -5,6 +5,6 @@ import net.minecraft.item.Item;
 public class ItemDebug extends Item {
 
     public ItemDebug() {
-        super(new Properties().group(Items.GROUP_GENERATOR));
+        super(new Properties().group(GroupGenerator.INSTANCE));
     }
 }

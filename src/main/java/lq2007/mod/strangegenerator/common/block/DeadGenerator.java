@@ -18,6 +18,6 @@ public class DeadGenerator extends BaseGenerator<TileDeadGenerator> {
 
     @Override
     protected boolean canPlace(BlockItemUseContext context) {
-        return false;
+        return true;
     }
 }

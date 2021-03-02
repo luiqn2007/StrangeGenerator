@@ -1,6 +1,5 @@
 package lq2007.mod.strangegenerator.common.block;
 
-import lq2007.mod.strangegenerator.common.tile.TileEntities;
 import lq2007.mod.strangegenerator.common.tile.TileInviteGenerator;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,6 +19,6 @@ public class InviteGenerator extends BaseGenerator<TileInviteGenerator> {
     @Override
     protected boolean canPlace(BlockItemUseContext context) {
         // todo configuration
-        return placeByPlayer(context, TileEntities.TILE_INVITE_GENERATOR, 1, false);
+        return placeByPlayer(context, 1, false);
     }
 }

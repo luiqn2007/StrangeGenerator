@@ -4,7 +4,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import lq2007.mod.strangegenerator.common.capability.OwnerEnergyStorage;
-import lq2007.mod.strangegenerator.common.item.OwnerBlockItem;
+import lq2007.mod.strangegenerator.common.block.OwnerBlockItem;
 import lq2007.mod.strangegenerator.util.CollectionUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -85,6 +85,10 @@ public abstract class BaseTileGenerator extends TileEntity {
         if (storage.receiveEnergy(energy, false) > 0) {
             markDirty();
         }
+    }
+
+    public void removeEnergy(int energy) {
+        storage.removeEnergy(energy);
     }
 
     @Override

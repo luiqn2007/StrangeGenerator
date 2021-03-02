@@ -1,5 +1,6 @@
 package lq2007.mod.strangegenerator.common.tile;
 
+import lq2007.mod.strangegenerator.StrangeGenerator;
 import lq2007.mod.strangegenerator.common.capability.Capabilities;
 import lq2007.mod.strangegenerator.common.capability.IWorldData;
 import net.minecraft.block.Block;
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 public class TileBurnGenerator extends BaseTickableTileGenerator {
 
     public TileBurnGenerator() {
-        super(TileEntities.TILE_BURN_GENERATOR.get(), false);
+        super(StrangeGenerator.TILE_ENTITIES.get(TileBurnGenerator.class), false);
     }
 
     @Override

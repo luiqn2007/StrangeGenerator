@@ -1,8 +1,5 @@
 package lq2007.mod.strangegenerator.common.block;
 
-import lq2007.mod.strangegenerator.common.capability.Capabilities;
-import lq2007.mod.strangegenerator.common.tile.BaseTileGenerator;
-import lq2007.mod.strangegenerator.common.tile.TileEntities;
 import lq2007.mod.strangegenerator.common.tile.TilePlayerCountGenerator;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,6 +22,6 @@ public class PlayerCountGenerator extends BaseGenerator<TilePlayerCountGenerator
 
     @Override
     protected boolean canPlace(BlockItemUseContext context) {
-        return placeByPlayer(context, TileEntities.TILE_PLAYER_COUNT_GENERATOR, 1, false);
+        return placeByPlayer(context, 1, false);
     }
 }

@@ -1,21 +1,22 @@
 package lq2007.mod.strangegenerator.common.tile;
 
 import com.google.common.collect.ImmutableSet;
+import lq2007.mod.strangegenerator.StrangeGenerator;
 import lq2007.mod.strangegenerator.common.data.Player;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 // todo power during dead
 public class TileDeadGenerator extends BaseTileGenerator implements IInviteGenerator {
@@ -23,7 +24,7 @@ public class TileDeadGenerator extends BaseTileGenerator implements IInviteGener
     private final Map<UUID, Player> watchedPlayer = new HashMap<>();
 
     public TileDeadGenerator() {
-        super(TileEntities.TILE_DEAD_GENERATOR.get(), false);
+        super(StrangeGenerator.TILE_ENTITIES.get(TileDeadGenerator.class), false);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class TileDeadGenerator extends BaseTileGenerator implements IInviteGener
             Entity entity = event.getEntity();
             World world = entity.world;
             if (!event.isCanceled() && entity instanceof PlayerEntity && world instanceof ServerWorld) {
-                TileEntityType<TileDeadGenerator> type = TileEntities.TILE_DEAD_GENERATOR.get();
+                TileEntityType<TileDeadGenerator> type = StrangeGenerator.TILE_ENTITIES.get(TileDeadGenerator.class);
                 UUID deadPlayer = entity.getUniqueID();
                 for (TileDeadGenerator generator : BaseTileGenerator.getGenerators(type)) {
                     if (generator.isInvited(deadPlayer)) {

@@ -1,14 +1,16 @@
 package lq2007.mod.strangegenerator.common.block;
 
-import lq2007.mod.strangegenerator.common.item.Items;
+import lq2007.mod.strangegenerator.StrangeGenerator;
+import lq2007.mod.strangegenerator.common.item.ItemDebug;
 import lq2007.mod.strangegenerator.common.tile.BaseTileGenerator;
 import lq2007.mod.strangegenerator.common.tile.NoTileGenerator;
-import lq2007.mod.strangegenerator.common.tile.TileEntities;
+import lq2007.mod.strangegenerator.register.ICustomItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -20,7 +22,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,7 +31,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-public abstract class BaseGenerator<T extends BaseTileGenerator> extends Block {
+public abstract class BaseGenerator<T extends BaseTileGenerator> extends Block implements ICustomItem {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -67,10 +68,36 @@ public abstract class BaseGenerator<T extends BaseTileGenerator> extends Block {
         return null;
     }
 
+    protected void setTileClass() {
+        if (hasTileClass) {
+            if (tileClass == null) {
+                hasTileClass = false;
+                Type superclass = getClass().getGenericSuperclass();
+                if (superclass instanceof ParameterizedType) {
+                    Type[] arguments = ((ParameterizedType) superclass).getActualTypeArguments();
+                    if (arguments.length > 0) {
+                        Type type = arguments[0];
+                        if (type instanceof Class<?>) {
+                            tileClass = (Class<T>) type;
+                            if (tileClass == NoTileGenerator.class) return;
+                            try {
+                                creator = tileClass.getConstructor();
+                                creator.setAccessible(false);
+                                hasTileClass = true;
+                            } catch (NoSuchMethodException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         ItemStack heldItem = player.getHeldItem(handIn);
-        if (heldItem.getItem() == Items.ITEM_DEBUG.get()) {
+        if (heldItem.getItem() == StrangeGenerator.ITEMS.get(ItemDebug.class)) {
             doDebug(worldIn, pos, state, player, heldItem, hit);
         }
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
@@ -89,46 +116,28 @@ public abstract class BaseGenerator<T extends BaseTileGenerator> extends Block {
         }
     }
 
-    protected void setTileClass() {
-        if (hasTileClass) {
-            if (creator == null) {
-                if (tileClass == null) {
-                    hasTileClass = false;
-                    Type superclass = getClass().getGenericSuperclass();
-                    if (superclass instanceof ParameterizedType) {
-                        Type[] arguments = ((ParameterizedType) superclass).getActualTypeArguments();
-                        if (arguments.length > 0) {
-                            Type type = arguments[0];
-                            if (type instanceof Class<?>) {
-                                tileClass = (Class<T>) type;
-                                if (tileClass == NoTileGenerator.class) return;
-                                try {
-                                    creator = tileClass.getConstructor();
-                                    creator.setAccessible(false);
-                                    hasTileClass = true;
-                                } catch (NoSuchMethodException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public abstract void doDebug(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack stack, BlockRayTraceResult hitTrace);
 
     protected abstract boolean canPlace(BlockItemUseContext context);
 
-    protected boolean placeByPlayer(BlockItemUseContext context, RegistryObject<TileEntityType<T>> type, int maxCount, boolean allWorld) {
-        PlayerEntity player = context.getPlayer();
-        if (player == null || !(player.world instanceof ServerWorld)) return false;
-        // todo configuration 0
-        if (allWorld) {
-            return BaseTileGenerator.getGeneratorCount(type.get(), player.getUniqueID()) < maxCount;
-        } else {
-            return BaseTileGenerator.getGeneratorCount(type.get(), (ServerWorld) player.world, player.getUniqueID()) < maxCount;
+    protected boolean placeByPlayer(BlockItemUseContext context, int maxCount, boolean allWorld) {
+        setTileClass();
+        if (hasTileClass) {
+            PlayerEntity player = context.getPlayer();
+            if (player == null || !(player.world instanceof ServerWorld)) return false;
+            // todo configuration 0
+            TileEntityType<?> type = StrangeGenerator.TILE_ENTITIES.get(tileClass);
+            if (allWorld) {
+                return BaseTileGenerator.getGeneratorCount(type, player.getUniqueID()) < maxCount;
+            } else {
+                return BaseTileGenerator.getGeneratorCount(type, (ServerWorld) player.world, player.getUniqueID()) < maxCount;
+            }
         }
+        return true;
+    }
+
+    @Override
+    public BlockItem newBlockItem() {
+        return new OwnerBlockItem<>(StrangeGenerator.BLOCKS.get(getClass()));
     }
 }

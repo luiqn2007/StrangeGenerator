@@ -1,13 +1,13 @@
 package lq2007.mod.strangegenerator.common.tile;
 
+import lq2007.mod.strangegenerator.StrangeGenerator;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class TilePlayerCountGenerator extends BaseTickableTileGenerator {
 
     public TilePlayerCountGenerator() {
-        super(TileEntities.TILE_PLAYER_COUNT_GENERATOR.get(), false);
+        super(StrangeGenerator.TILE_ENTITIES.get(TilePlayerCountGenerator.class), false);
     }
 
     // todo tps?

@@ -1,5 +1,6 @@
 package lq2007.mod.strangegenerator.common.tile;
 
+import lq2007.mod.strangegenerator.StrangeGenerator;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.ServerChatEvent;
@@ -11,7 +12,7 @@ import java.util.UUID;
 public class TileChatMessageGenerator extends BaseTileGenerator {
 
     public TileChatMessageGenerator() {
-        super(TileEntities.TILE_CHAT_MESSAGE_GENERATOR.get(), false);
+        super(StrangeGenerator.TILE_ENTITIES.get(TileChatMessageGenerator.class), false);
     }
 
     @Mod.EventBusSubscriber
@@ -34,7 +35,7 @@ public class TileChatMessageGenerator extends BaseTileGenerator {
                 count = length * 5;
             }
 
-            TileEntityType<TileChatMessageGenerator> type = TileEntities.TILE_CHAT_MESSAGE_GENERATOR.get();
+            TileEntityType<TileChatMessageGenerator> type = StrangeGenerator.TILE_ENTITIES.get(TileChatMessageGenerator.class);
             ServerWorld world = event.getPlayer().getServerWorld();
             UUID owner = event.getPlayer().getUniqueID();
             BaseTileGenerator.getGenerators(type, world, owner).forEach(te -> te.receiveEnergy(count));
